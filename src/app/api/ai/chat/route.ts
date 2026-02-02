@@ -13,6 +13,16 @@ function timeoutPromise(ms: number): Promise<never> {
   });
 }
 
+// 智能处理 API 端点
+function getApiEndpoint(endpoint: string): string {
+  // 如果端点已经包含 /chat/completions，直接使用
+  if (endpoint.includes('/chat/completions')) {
+    return endpoint;
+  }
+  // 否则拼接标准路径
+  return `${endpoint}/chat/completions`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body: AIChatRequest = await request.json();
@@ -28,13 +38,16 @@ export async function POST(request: NextRequest) {
     // 构建请求体
     const chatBody = buildChatRequest(body);
 
+    // 获取正确的 API 端点
+    const apiEndpoint = getApiEndpoint(body.config.endpoint);
+
     // 带超时的 fetch
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
       // 调用外部 AI API
-      const response = await fetch(`${body.config.endpoint}/chat/completions`, {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
