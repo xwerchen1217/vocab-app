@@ -37,3 +37,27 @@ export interface TranslateResponse {
     translatedText: string;
   };
 }
+
+// AI 配置
+export interface AIConfig {
+  apiKey: string;
+  endpoint: string;
+  model?: string;
+  provider: 'openai' | 'anthropic' | 'custom';
+}
+
+// AI 聊天请求
+export interface AIChatRequest {
+  query: string;
+  type: 'word' | 'sentence';
+  config: AIConfig;
+}
+
+// AI 聊天响应
+export interface AIChatResponse {
+  content: string;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+  };
+}
