@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { WordEntry } from '@/types';
+import { WordEntry, AIConfig } from '@/types';
 import { wordDb } from '@/lib/db';
 import {
   SyncConfig,
@@ -47,6 +47,11 @@ interface WordStore {
   setIsLoading: (loading: boolean) => void;
   error: string | null;
   setError: (error: string | null) => void;
+
+  // AI config state
+  aiConfig: AIConfig | null;
+  setAIConfig: (config: AIConfig | null) => void;
+  getAIConfig: () => AIConfig | null;
 }
 
 export const useWordStore = create<WordStore>((set, get) => ({
@@ -165,4 +170,23 @@ export const useWordStore = create<WordStore>((set, get) => ({
   setIsLoading: (loading) => set({ isLoading: loading }),
   error: null,
   setError: (error) => set({ error }),
+
+  // AI config state
+  aiConfig: null,
+  setAIConfig: (config) => {
+    set({ aiConfig: config });
+    // 保存到 localStorage
+    if (typeof window !== 'undefined') {
+      if (config) {
+        localStorage.setItem('ai-config', JSON.stringify(config));
+      } else {
+        localStorage.removeItem('ai-config');
+      }
+    }
+  },
+  getAIConfig: () => {
+    if (typeof window === 'undefined') return null;
+    const stored = localStorage.getItem('ai-config');
+    return stored ? JSON.parse(stored) : null;
+  },
 }));
