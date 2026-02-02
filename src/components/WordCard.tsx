@@ -2,6 +2,7 @@
 
 import { WordEntry } from '@/types';
 import { SpeakButton } from './SpeakButton';
+import { AIAssistant } from './AIAssistant';
 import { useWordStore } from '@/store/useWordStore';
 import { wordDb } from '@/lib/db';
 
@@ -108,6 +109,9 @@ export function WordCard({ word, synonyms = [] }: WordCardProps) {
         >
           {saved ? '✓ 已加入复习' : '⭐ 加入复习'}
         </button>
+
+        {/* AI Assistant */}
+        <AIAssistant query={word.word} type="word" />
       </div>
     </div>
   );
