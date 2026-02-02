@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { SentenceResult, ExtractedWord, loadChineseTranslations, loadSentenceTranslation } from '@/lib/sentence';
 import { ExtractedWordItem } from './ExtractedWordItem';
+import { AIAssistant } from './AIAssistant';
 import { wordDb } from '@/lib/db';
 import { WordEntry } from '@/types';
 
@@ -129,6 +130,11 @@ export function SentenceCard({ result }: SentenceCardProps) {
               {translation}
             </p>
           </div>
+        </div>
+
+        {/* AI Assistant for sentence analysis */}
+        <div className="px-6 pb-6">
+          <AIAssistant query={result.original} type="sentence" />
         </div>
       </div>
 
