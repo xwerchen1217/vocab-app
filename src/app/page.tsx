@@ -16,7 +16,7 @@ import { WordEntry } from '@/types';
 function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q');
-  const { currentWord, setCurrentWord, isLoading, setIsLoading, setSavedWords, loadSyncConfig, autoSync } = useWordStore();
+  const { currentWord, setCurrentWord, isLoading, setIsLoading, setSavedWords, loadSyncConfig, autoSync, setAIConfig, getAIConfig } = useWordStore();
   const [synonyms, setSynonyms] = useState<string[]>([]);
   const [sentenceResult, setSentenceResult] = useState<Awaited<ReturnType<typeof processSentence>> | null>(null);
 
@@ -27,9 +27,16 @@ function SearchContent() {
     });
     // Load sync config on client side
     loadSyncConfig();
+
+    // Load AI config
+    const config = getAIConfig();
+    if (config) {
+      setAIConfig(config);
+    }
+
     // Trigger auto-sync
     autoSync();
-  }, [setSavedWords, loadSyncConfig, autoSync]);
+  }, [setSavedWords, loadSyncConfig, setAIConfig, autoSync, getAIConfig]);
 
   // Handle search - detect input type
   const handleSearch = async (input: string) => {
