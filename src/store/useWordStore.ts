@@ -52,6 +52,9 @@ interface WordStore {
   aiConfig: AIConfig | null;
   setAIConfig: (config: AIConfig | null) => void;
   getAIConfig: () => AIConfig | null;
+  loadAIConfig: () => Promise<void>;
+  isEnvConfigured: boolean;
+  setIsEnvConfigured: (configured: boolean) => void;
 }
 
 export const useWordStore = create<WordStore>((set, get) => ({
@@ -173,6 +176,7 @@ export const useWordStore = create<WordStore>((set, get) => ({
 
   // AI config state
   aiConfig: null,
+  isEnvConfigured: false,
   setAIConfig: (config) => {
     set({ aiConfig: config });
     // 保存到 localStorage
@@ -184,9 +188,38 @@ export const useWordStore = create<WordStore>((set, get) => ({
       }
     }
   },
+  setIsEnvConfigured: (configured) => set({ isEnvConfigured: configured }),
   getAIConfig: () => {
     if (typeof window === 'undefined') return null;
     const stored = localStorage.getItem('ai-config');
     return stored ? JSON.parse(stored) : null;
+  },
+  loadAIConfig: async () => {
+    // 1. 先尝试从 localStorage 读取用户配置
+    const stored = get().getAIConfig();
+    if (stored) {
+      set({ aiConfig: stored, isEnvConfigured: false });
+      return;
+    }
+
+    // 2. localStorage 没有配置，尝试从环境变量加载
+    try {
+      const response = await fetch('/api/ai/config/full');
+      if (!response.ok) {
+        set({ aiConfig: null, isEnvConfigured: false });
+        return;
+      }
+
+      const config = await response.json() as AIConfig;
+      set({ aiConfig: config, isEnvConfigured: true });
+
+      // 自动保存到 localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ai-config', JSON.stringify(config));
+      }
+    } catch (error) {
+      console.error('Failed to load AI config from env:', error);
+      set({ aiConfig: null, isEnvConfigured: false });
+    }
   },
 }));
