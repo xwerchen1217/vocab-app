@@ -81,9 +81,9 @@ export function WordCard({ word, synonyms = [] }: WordCardProps) {
               📚 Similar ({word.partOfSpeech})
             </h3>
             <div className="flex flex-wrap gap-2">
-              {synonyms.map((synonym) => (
+              {synonyms.map((synonym, index) => (
                 <span
-                  key={synonym}
+                  key={`${synonym}-${index}`}
                   className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   onClick={() => {
                     // Could trigger search for synonym
